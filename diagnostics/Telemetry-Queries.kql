@@ -1,0 +1,6 @@
+// Azure Monitor / Log Analytics Forensic Telemetry Query
+// Domain: Real-Time Security: Autonomous Fraud Velocity Interception on Azure Event Hubs
+AzureDiagnostics
+| where TimeGenerated >= ago(24h)
+| summarize TotalEvaluations = count(), Refusals = countif(ResultType != "Success") by bin(TimeGenerated, 15m), Resource
+| order by TimeGenerated desc
