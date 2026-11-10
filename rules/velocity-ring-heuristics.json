@@ -1,0 +1,10 @@
+{
+  "maxNewPayeesPer10Minutes": 3,
+  "maxCumulativeOutboundGbpPer15Minutes": 25000,
+  "impossibleTravelVelocityKmh": 900,
+  "hardBlockThresholdScore": 0.95,
+  "stepUpHoldRange": [
+    0.75,
+    0.94
+  ]
+}

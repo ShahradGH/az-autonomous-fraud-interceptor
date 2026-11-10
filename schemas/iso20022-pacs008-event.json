@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ISO 20022 pacs.008 Credit Transfer Telemetry",
+  "required": [
+    "endToEndId",
+    "debtorAccount",
+    "creditorAccount",
+    "instructedAmountGbp",
+    "deviceFingerprintHash"
+  ]
+}

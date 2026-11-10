@@ -1,0 +1,6 @@
+// Azure Monitor / Event Hubs Partition Velocity & Quarantine Shunt Telemetry
+AzureDiagnostics
+| where ResourceProvider == "MICROSOFT.EVENTHUB" and Category == "OperationalLogs"
+| summarize TotalEvents = count(), ThrottledEvents = countif(Status == "Throttled") by bin(TimeGenerated, 1m), Resource, PartitionId_s
+| project TimeGenerated, Resource, PartitionId_s, TotalEvents, ThrottledEvents
+| order by TotalEvents desc
