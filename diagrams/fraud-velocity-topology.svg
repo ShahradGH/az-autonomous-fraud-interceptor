@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <defs>
+    <style>
+      .title { font: 700 30px 'Segoe UI', system-ui, sans-serif; fill: #f8fafc; }
+      .subtitle { font: 400 17px 'Segoe UI', system-ui, sans-serif; fill: #94a3b8; }
+      .zone-label { font: 700 15px 'Segoe UI', system-ui, sans-serif; fill: #38bdf8; letter-spacing: 1px; }
+      .box-title { font: 700 17px 'Segoe UI', system-ui, sans-serif; fill: #f1f5f9; }
+      .box-sub { font: 400 13px 'Segoe UI', system-ui, sans-serif; fill: #cbd5e1; }
+      .mono { font: 600 12px 'Cascadia Code', Consolas, monospace; fill: #7dd3fc; }
+      .badge { font: 700 12px 'Segoe UI', system-ui, sans-serif; fill: #0a1128; }
+    </style>
+    <marker id="arr-c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8"/>
+    </marker>
+    <marker id="arr-e" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981"/>
+    </marker>
+    <marker id="arr-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#ef4444"/>
+    </marker>
+  </defs>
+
+  <rect width="1920" height="1080" fill="#0a1128"/>
+  <text x="64" y="64" class="title">Real-Time Fraud Interception: Fabric RTI + Event Hubs + AI Cohort Scorer</text>
+  <text x="64" y="94" class="subtitle">Zero-Declarative-IaC Control Plane | Event Hubs Shunt + Fabric Eventstream/Eventhouse + Managed Redis + Graph SOC Loop</text>
+
+  <!-- Enclave 1: Payment Ingress & Event Hubs -->
+  <rect x="64" y="135" width="430" height="840" rx="14" fill="#0f172a" stroke="#1e3a8a" stroke-width="2" stroke-dasharray="8 5"/>
+  <text x="86" y="168" class="zone-label">PAYMENT INGRESS &amp; EVENT HUBS</text>
+
+  <rect x="92" y="205" width="374" height="175" rx="10" fill="#172554" stroke="#38bdf8" stroke-width="2"/>
+  <text x="112" y="238" class="box-title">ISO 20022 / Checkout Stream</text>
+  <text x="112" y="264" class="mono">schemas/iso20022-pacs008-event.json</text>
+  <text x="112" y="294" class="box-sub">Merchant: contoso-uk-retail</text>
+  <text x="112" y="320" class="box-sub">Signals: BIN, DeviceHash, ASN, GeoVel</text>
+  <rect x="112" y="340" width="185" height="24" rx="4" fill="#38bdf8"/>
+  <text x="122" y="357" class="badge">HIGH-THROUGHPUT INGRESS</text>
+
+  <rect x="92" y="425" width="374" height="250" rx="10" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+  <text x="112" y="459" class="box-title">Azure Event Hubs (172.23.4.10)</text>
+  <text x="112" y="485" class="mono">src/Test-EventHubVelocityShunt.ps1</text>
+  <text x="112" y="518" class="mono">• eh-tx-verified-fastlane (&lt; 35 ms)</text>
+  <text x="112" y="544" class="mono">• eh-tx-quarantine-hold (BIN &gt; 150/10s)</text>
+  <text x="112" y="576" class="box-sub">Backpressure guard sheds non-critical</text>
+  <text x="112" y="598" class="box-sub">load if lag &gt; 5,000 events</text>
+  <rect x="112" y="630" width="215" height="24" rx="4" fill="#10b981"/>
+  <text x="122" y="647" class="badge">FAST-LANE ISOLATION</text>
+
+  <rect x="92" y="720" width="374" height="220" rx="10" fill="#111c38" stroke="#64748b" stroke-width="1.5"/>
+  <text x="112" y="754" class="box-title">PowerShell REST Control Plane</text>
+  <text x="112" y="780" class="mono">Invoke-FabricRtiEventhouseSync.ps1</text>
+  <text x="112" y="810" class="box-sub">Syncs Event Hubs partition retention &amp;</text>
+  <text x="112" y="834" class="box-sub">Fabric Eventhouse streaming policies</text>
+  <rect x="112" y="880" width="215" height="24" rx="4" fill="#38bdf8"/>
+  <text x="122" y="897" class="badge">INVOKE-AZRESTMETHOD</text>
+
+  <!-- Enclave 2: Fabric RTI + Managed Redis + AI Cohort Scorer -->
+  <rect x="545" y="135" width="800" height="840" rx="14" fill="#0f172a" stroke="#0ea5e9" stroke-width="2"/>
+  <text x="568" y="168" class="zone-label">FABRIC RTI &amp; AI COHORT SCORING (172.23.0.0/16)</text>
+
+  <rect x="575" y="205" width="360" height="225" rx="10" fill="#172554" stroke="#38bdf8" stroke-width="2"/>
+  <text x="598" y="238" class="box-title">Fabric RTI Eventstream</text>
+  <text x="598" y="264" class="mono">Zero-ETL Streaming Ingestion</text>
+  <text x="598" y="294" class="box-sub">10-second tumbling &amp; sliding</text>
+  <text x="598" y="318" class="box-sub">windows compute BIN velocity &amp;</text>
+  <text x="598" y="342" class="box-sub">distinct BIN cardinality in flight</text>
+  <rect x="598" y="378" width="205" height="24" rx="4" fill="#38bdf8"/>
+  <text x="610" y="395" class="badge">SUB-SECOND STREAMING</text>
+
+  <rect x="955" y="205" width="360" height="225" rx="10" fill="#172554" stroke="#f59e0b" stroke-width="2"/>
+  <text x="978" y="238" class="box-title">Azure Managed Redis (172.23.6.15)</text>
+  <text x="978" y="264" class="mono">Sliding-Window State Store</text>
+  <text x="978" y="294" class="box-sub">Sub-millisecond HyperLogLog</text>
+  <text x="978" y="318" class="box-sub">distinct BIN counters &amp;</text>
+  <text x="978" y="342" class="box-sub">device fingerprint quarantine</text>
+  <rect x="978" y="378" width="195" height="24" rx="4" fill="#f59e0b"/>
+  <text x="990" y="395" class="badge">REDIS STATE &lt; 2 ms</text>
+
+  <!-- AI Behavioural Cohort Scorer -->
+  <rect x="575" y="475" width="740" height="255" rx="10" fill="#172554" stroke="#a855f7" stroke-width="2"/>
+  <text x="598" y="509" class="box-title">AI Subcomponent: Behavioural Cohort Scorer &amp; Conversion Guard</text>
+  <text x="598" y="535" class="mono">ai/Invoke-FraudCohortScorer.ps1 | ADR-001 False-Positive Ceiling</text>
+
+  <rect x="598" y="560" width="220" height="142" rx="8" fill="#0f172a" stroke="#10b981" stroke-width="1.5"/>
+  <text x="612" y="588" class="box-title">PERMIT_FASTLANE</text>
+  <text x="612" y="612" class="mono">Score &lt; 0.42</text>
+  <text x="612" y="636" class="box-sub">Zero friction checkout</text>
+  <text x="612" y="658" class="box-sub">Latency &lt; 35 ms</text>
+
+  <rect x="836" y="560" width="220" height="142" rx="8" fill="#0f172a" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="850" y="588" class="box-title">3DS2 STEP-UP</text>
+  <text x="850" y="612" class="mono">0.42 &lt;= Score &lt; Drop</text>
+  <text x="850" y="636" class="box-sub">Peak-hour (+0.06) &amp;</text>
+  <text x="850" y="658" class="box-sub">flash-sale protected</text>
+
+  <rect x="1074" y="560" width="218" height="142" rx="8" fill="#0f172a" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="1088" y="588" class="box-title">HARD_DROP_RING</text>
+  <text x="1088" y="612" class="mono">Score &gt;= HardDrop</text>
+  <text x="1088" y="636" class="box-sub">Bot-ring shunted &amp;</text>
+  <text x="1088" y="658" class="box-sub">SOC Teams alerted</text>
+
+  <rect x="575" y="775" width="740" height="165" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+  <text x="598" y="809" class="box-title">Microsoft Fabric KQL Eventhouse</text>
+  <text x="598" y="835" class="mono">queries/Payment-Velocity-Spikes.kql | 30d Soft-Delete Retention</text>
+  <text x="598" y="865" class="box-sub">Stores real-time cohort verdicts, ASN datacentre ratios, and 3DS2 step-up conversion telemetry.</text>
+
+  <!-- Enclave 3: Microsoft Graph SOC Loop -->
+  <rect x="1395" y="135" width="460" height="840" rx="14" fill="#0f172a" stroke="#6366f1" stroke-width="2"/>
+  <text x="1418" y="168" class="zone-label">SOC GOVERNANCE &amp; GRAPH</text>
+
+  <rect x="1425" y="205" width="400" height="360" rx="10" fill="#172554" stroke="#ef4444" stroke-width="2"/>
+  <text x="1448" y="238" class="box-title">Microsoft Graph v2.x SOC Card</text>
+  <text x="1448" y="264" class="mono">graph/Send-SocFraudEscalationCard.ps1</text>
+  <text x="1448" y="294" class="box-sub">POST /v1.0/teams/{id}/channels/{id}/messages</text>
+  <text x="1448" y="328" class="box-sub">Adaptive Card v1.5 surfaces:</text>
+  <text x="1448" y="356" class="mono">• Cohort RiskScore &amp; HardDrop</text>
+  <text x="1448" y="382" class="mono">• PeakConversionGuard Status</text>
+  <text x="1448" y="408" class="mono">• Confirm Shunt / Downgrade 3DS2</text>
+  <rect x="1448" y="465" width="235" height="24" rx="4" fill="#ef4444"/>
+  <text x="1460" y="482" class="badge">HUMAN-IN-THE-LOOP SOC</text>
+
+  <rect x="1425" y="610" width="400" height="330" rx="10" fill="#1e293b" stroke="#10b981" stroke-width="1.5"/>
+  <text x="1448" y="644" class="box-title">Conversion &amp; WAF Feedback</text>
+  <text x="1448" y="674" class="box-sub">Confirmed bot-ring fingerprints</text>
+  <text x="1448" y="698" class="box-sub">propagate to edge WAF while</text>
+  <text x="1448" y="722" class="box-sub">flash-sale cohorts stay unblocked.</text>
+  <rect x="1448" y="810" width="235" height="24" rx="4" fill="#10b981"/>
+  <text x="1460" y="827" class="badge">PEAK CONVERSION PROTECTED</text>
+
+  <!-- Edges -->
+  <line x1="279" y1="380" x2="279" y2="425" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arr-c)"/>
+  <line x1="466" y1="530" x2="575" y2="330" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arr-c)"/>
+  <line x1="755" y1="430" x2="755" y2="475" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arr-c)"/>
+  <line x1="1135" y1="430" x2="1135" y2="475" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arr-c)"/>
+  <line x1="945" y1="730" x2="945" y2="775" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arr-c)"/>
+  <line x1="1315" y1="600" x2="1425" y2="390" stroke="#ef4444" stroke-width="2.5" marker-end="url(#arr-r)"/>
+
+  <text x="64" y="1038" class="subtitle">Contoso Sovereign Platform Reference Architecture | Synthetic ISO 20022 &amp; Fabric RTI Fixtures</text>
+</svg>

@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <defs>
+    <style>
+      .title { font: 700 30px 'Segoe UI', system-ui, sans-serif; fill: #f8fafc; }
+      .subtitle { font: 400 17px 'Segoe UI', system-ui, sans-serif; fill: #94a3b8; }
+      .actor { font: 700 16px 'Segoe UI', system-ui, sans-serif; fill: #f1f5f9; text-anchor: middle; }
+      .actor-sub { font: 400 12px 'Cascadia Code', Consolas, monospace; fill: #7dd3fc; text-anchor: middle; }
+      .msg { font: 600 14px 'Segoe UI', system-ui, sans-serif; fill: #e2e8f0; }
+      .proto { font: 600 12px 'Cascadia Code', Consolas, monospace; fill: #38bdf8; }
+      .branch-title { font: 700 14px 'Segoe UI', system-ui, sans-serif; fill: #f8fafc; }
+    </style>
+    <marker id="arr-c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8"/>
+    </marker>
+    <marker id="arr-e" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981"/>
+    </marker>
+    <marker id="arr-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#ef4444"/>
+    </marker>
+    <marker id="arr-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#f59e0b"/>
+    </marker>
+  </defs>
+
+  <rect width="1920" height="1080" fill="#0a1128"/>
+  <text x="64" y="64" class="title">Sub-50ms Fraud Interception &amp; Peak-Conversion Calibration Sequence</text>
+  <text x="64" y="94" class="subtitle">Event Hubs Velocity Shunt, Fabric Eventstream + Redis Sliding Window, AI Cohort Scoring, and Graph SOC Loop</text>
+
+  <!-- Actors -->
+  <g>
+    <rect x="75" y="130" width="230" height="72" rx="8" fill="#172554" stroke="#38bdf8" stroke-width="2"/>
+    <text x="190" y="162" class="actor">Checkout Ingress</text>
+    <text x="190" y="184" class="actor-sub">ISO 20022 pacs.008</text>
+    <line x1="190" y1="202" x2="190" y2="990" stroke="#334155" stroke-width="2" stroke-dasharray="6 6"/>
+
+    <rect x="375" y="130" width="240" height="72" rx="8" fill="#172554" stroke="#10b981" stroke-width="2"/>
+    <text x="495" y="162" class="actor">Azure Event Hubs</text>
+    <text x="495" y="184" class="actor-sub">172.23.4.10 (Shunt)</text>
+    <line x1="495" y1="202" x2="495" y2="990" stroke="#334155" stroke-width="2" stroke-dasharray="6 6"/>
+
+    <rect x="685" y="130" width="240" height="72" rx="8" fill="#172554" stroke="#f59e0b" stroke-width="2"/>
+    <text x="805" y="162" class="actor">Fabric RTI + Redis</text>
+    <text x="805" y="184" class="actor-sub">10s Window (&lt; 2 ms)</text>
+    <line x1="805" y1="202" x2="805" y2="990" stroke="#334155" stroke-width="2" stroke-dasharray="6 6"/>
+
+    <rect x="995" y="130" width="250" height="72" rx="8" fill="#172554" stroke="#a855f7" stroke-width="2"/>
+    <text x="1120" y="162" class="actor">AI Cohort Scorer</text>
+    <text x="1120" y="184" class="actor-sub">Invoke-FraudCohortScorer</text>
+    <line x1="1120" y1="202" x2="1120" y2="990" stroke="#334155" stroke-width="2" stroke-dasharray="6 6"/>
+
+    <rect x="1315" y="130" width="230" height="72" rx="8" fill="#172554" stroke="#38bdf8" stroke-width="2"/>
+    <text x="1430" y="162" class="actor">KQL Eventhouse</text>
+    <text x="1430" y="184" class="actor-sub">PaymentTelemetryStream</text>
+    <line x1="1430" y1="202" x2="1430" y2="990" stroke="#334155" stroke-width="2" stroke-dasharray="6 6"/>
+
+    <rect x="1615" y="130" width="230" height="72" rx="8" fill="#172554" stroke="#6366f1" stroke-width="2"/>
+    <text x="1730" y="162" class="actor">Teams SOC Channel</text>
+    <text x="1730" y="184" class="actor-sub">Graph v2.x Card</text>
+    <line x1="1730" y1="202" x2="1730" y2="990" stroke="#334155" stroke-width="2" stroke-dasharray="6 6"/>
+  </g>
+
+  <!-- Step 1 -->
+  <line x1="190" y1="255" x2="495" y2="255" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arr-c)"/>
+  <text x="210" y="244" class="msg">1. Stream checkout event (BIN, DeviceHash, ASN)</text>
+
+  <line x1="495" y1="315" x2="805" y2="315" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arr-c)"/>
+  <text x="515" y="304" class="msg">2. Eventstream computes 10s BIN velocity + Redis HLL</text>
+
+  <line x1="805" y1="375" x2="1120" y2="375" stroke="#a855f7" stroke-width="2.5" marker-end="url(#arr-c)"/>
+  <text x="825" y="364" class="msg">3. Score multi-dimensional cohort entropy</text>
+
+  <!-- Calibration Alt Box -->
+  <rect x="460" y="410" width="990" height="250" rx="10" fill="#0f172a" stroke="#a855f7" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="480" y="438" class="branch-title">ALT: Behavioural Cohort Calibration (ADR-001 False-Positive Ceiling)</text>
+
+  <line x1="1120" y1="480" x2="495" y2="480" stroke="#10b981" stroke-width="2.5" marker-end="url(#arr-e)"/>
+  <text x="520" y="468" class="msg">4a. Score &lt; 0.42 -&gt; PERMIT_FASTLANE (eh-tx-verified-fastlane &lt; 35 ms)</text>
+
+  <line x1="1120" y1="545" x2="495" y2="545" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arr-a)"/>
+  <text x="520" y="533" class="msg">4b. Peak / Flash-Sale Cohort -&gt; CHALLENGE_3DS2_STEP_UP (Conversion Protected)</text>
+
+  <line x1="1120" y1="610" x2="495" y2="610" stroke="#ef4444" stroke-width="2.5" marker-end="url(#arr-r)"/>
+  <text x="520" y="598" class="msg">4c. Score &gt;= HardDrop -&gt; HARD_DROP_BOT_RING (eh-tx-quarantine-hold)</text>
+
+  <!-- Step 5 & 6 -->
+  <line x1="1120" y1="730" x2="1430" y2="730" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arr-c)"/>
+  <text x="1140" y="718" class="msg">5. Persist cohort telemetry to KQL Eventhouse</text>
+
+  <line x1="1120" y1="805" x2="1730" y2="805" stroke="#ef4444" stroke-width="2.5" marker-end="url(#arr-r)"/>
+  <text x="1140" y="793" class="msg">6. Hard-Drop -&gt; Dispatch SOC Teams Adaptive Card (Graph v1.0)</text>
+
+  <line x1="495" y1="885" x2="190" y2="885" stroke="#10b981" stroke-width="2.5" marker-end="url(#arr-e)"/>
+  <text x="210" y="873" class="msg">7. Authorised checkout verdict returned (&lt; 50 ms p95)</text>
+
+  <text x="64" y="1038" class="subtitle">Contoso Sovereign Platform | Fabric RTI Fraud Interception Sequence</text>
+</svg>

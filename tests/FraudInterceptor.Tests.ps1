@@ -1,83 +1,94 @@
 BeforeAll {
     $script:RepoRoot = Split-Path -Parent $PSScriptRoot
-    $script:EvaluatorPath = Join-Path $script:RepoRoot 'src/Test-EventHubVelocityShunt.ps1'
+    $script:ShuntScript = Join-Path $script:RepoRoot 'src/Test-EventHubVelocityShunt.ps1'
+    $script:FabricSyncScript = Join-Path $script:RepoRoot 'src/Invoke-FabricRtiEventhouseSync.ps1'
+    $script:CohortScorerScript = Join-Path $script:RepoRoot 'ai/Invoke-FraudCohortScorer.ps1'
+    $script:CalibrationPath = Join-Path $script:RepoRoot 'ai/fraud-calibration-eval.json'
+    $script:SocGraphScript = Join-Path $script:RepoRoot 'graph/Send-SocFraudEscalationCard.ps1'
     $script:KqlPath = Join-Path $script:RepoRoot 'queries/Payment-Velocity-Spikes.kql'
+    $script:CalibrationCases = Get-Content -Path $script:CalibrationPath -Raw | ConvertFrom-Json
 }
 
-Describe 'Real-Time Security: Autonomous Fraud Velocity Interception on Azure Event Hubs - 16-Test Verification Matrix' {
-    Context 'Positive Path: Structural & Domain Contract Verification (8 Tests)' {
-        It 'P-01: Primary PowerShell evaluator (src/Test-EventHubVelocityShunt.ps1) exists and is non-empty' {
-            Test-Path $script:EvaluatorPath | Should -BeTrue
-            (Get-Item $script:EvaluatorPath).Length | Should -BeGreaterThan 120
-        }
-        It 'P-02: Evaluator parses cleanly with zero PowerShell AST syntax errors' {
-            $errors = $null
-            [System.Management.Automation.Language.Parser]::ParseFile($script:EvaluatorPath, [ref]$null, [ref]$errors)
-            $errors.Count | Should -Be 0
-        }
-        It 'P-03: Enforces CmdletBinding and typed parameter block' {
-            $raw = Get-Content $script:EvaluatorPath -Raw
-            $raw | Should -Match '\[CmdletBinding\(\)\]'
-            $raw | Should -Match 'param\s*\('
-        }
-        It 'P-04: Returns structured PSCustomObject decision payload for downstream audit' {
-            $raw = Get-Content $script:EvaluatorPath -Raw
-            $raw | Should -Match '\[PSCustomObject\]@\{'
-        }
-        It 'P-05: KQL telemetry query (queries/Payment-Velocity-Spikes.kql) defines correlation and filtering clauses' {
-            Test-Path $script:KqlPath | Should -BeTrue
-            (Get-Content $script:KqlPath -Raw) | Should -Match 'where|summarize|project'
-        }
-        It 'P-06: Domain artefact schemas/iso20022-pacs008-event.json exists and is non-empty' {
-            $p = Join-Path $script:RepoRoot 'schemas/iso20022-pacs008-event.json'
-            Test-Path $p | Should -BeTrue
-            (Get-Item $p).Length | Should -BeGreaterThan 20
+Describe 'Real-Time Fraud Interception: Fabric RTI, Event Hubs & AI Cohort Scorer Suite' {
+    Context 'Event Hubs Velocity Shunt & Fabric RTI Control Plane' {
+        It 'Routes normal checkout telemetry to verified fastlane' {
+            $win = [PSCustomObject]@{
+                MerchantTenantId       = 'contoso-uk-retail'
+                DeviceFingerprintHash  = 'fp-001'
+                TxCount10s             = 12
+                DistinctBinCount10s    = 3
+                ConsumerGroupLagEvents = 120
+            }
+            $res = & $script:ShuntScript -WindowTelemetry $win
+            $res.RoutingVerdict | Should -Be 'ROUTE_TO_VERIFIED_FASTLANE'
+            $res.TargetEventHub | Should -Be 'eh-tx-verified-fastlane'
         }
 
-        It 'P-07: Domain artefact rules/velocity-ring-heuristics.json exists and is non-empty' {
-            $p = Join-Path $script:RepoRoot 'rules/velocity-ring-heuristics.json'
-            Test-Path $p | Should -BeTrue
-            (Get-Item $p).Length | Should -BeGreaterThan 20
+        It 'Shunts high-velocity BIN-stuffing attack (>150 tx/10s) to quarantine hub' {
+            $win = [PSCustomObject]@{
+                MerchantTenantId       = 'contoso-uk-retail'
+                DeviceFingerprintHash  = 'fp-bot-99'
+                TxCount10s             = 210
+                DistinctBinCount10s    = 34
+                ConsumerGroupLagEvents = 400
+            }
+            $res = & $script:ShuntScript -WindowTelemetry $win
+            $res.RoutingVerdict | Should -Be 'SHUNT_TO_QUARANTINE_HUB'
+            $res.TargetEventHub | Should -Be 'eh-tx-quarantine-hold'
         }
 
-        It 'P-08: Domain artefact fixtures/synthetic-payment-stream.json exists and is non-empty' {
-            $p = Join-Path $script:RepoRoot 'fixtures/synthetic-payment-stream.json'
-            Test-Path $p | Should -BeTrue
-            (Get-Item $p).Length | Should -BeGreaterThan 20
+        It 'Prepares Fabric RTI Eventhouse & Event Hubs ARM REST sync in DryRun mode' {
+            $sync = & $script:FabricSyncScript -WorkspaceId '00000000-0000-0000-0000-000000000010' -EventhouseName 'ehouse-contoso-fraud' -SubscriptionId '00000000-0000-0000-0000-000000000000' -ResourceGroupName 'rg-contoso-rti' -EventHubNamespace 'ehns-contoso-pay' -DryRun
+            $sync.Status | Should -Be 'DRY_RUN_PREPARED'
+            $sync.FabricApiUri | Should -Match 'api\.fabric\.microsoft\.com/v1/workspaces/'
+            $sync.KqlPolicy | Should -Match 'streamingingestion enable'
         }
     }
 
-    Context 'Negative Path: Refusal Gates & Zero-Leak Security Boundaries (8 Tests)' {
-        It 'N-01: Evaluator defines explicit refusal, hold, or veto action codes' {
-            $raw = Get-Content $script:EvaluatorPath -Raw
-            $raw | Should -Match 'VETO|BLOCK|HOLD|DENY|REFUSAL|QUARANTINE|REVOKE|ALERT|\$false'
+    Context 'AI Subcomponent: Behavioural Cohort Scorer & Peak-Conversion Guard' {
+        It 'Permits low-entropy peak-hour checkout via fastlane (FRAUD-401)' {
+            $case = $script:CalibrationCases | Where-Object { $_.caseId -eq 'FRAUD-401' }
+            $res = & $script:CohortScorerScript -CohortTelemetry $case
+            $res.RecommendedAction | Should -Be 'PERMIT_FASTLANE'
+            $res.RequiresSocEscalation | Should -BeFalse
         }
-        It 'N-02: Evaluator contains zero hardcoded storage keys, passwords, or SAS tokens' {
-            $raw = Get-Content $script:EvaluatorPath -Raw
-            $raw | Should -Not -Match 'AccountKey=|SharedAccessSignature=|Password='
+
+        It 'Triggers 3DS2 step-up for moderate entropy during peak hours (FRAUD-402)' {
+            $case = $script:CalibrationCases | Where-Object { $_.caseId -eq 'FRAUD-402' }
+            $res = & $script:CohortScorerScript -CohortTelemetry $case
+            $res.RecommendedAction | Should -Be 'CHALLENGE_3DS2_STEP_UP'
         }
-        It 'N-03: Evaluator contains zero private orchestrator domains or internal host IPs' {
-            $raw = Get-Content $script:EvaluatorPath -Raw
-            $raw | Should -Not -Match '192\.142\.41\.43|mvpfoundry\.alerasoul\.net'
+
+        It 'Hard-drops high-entropy datacentre BIN-stuffing bot ring (FRAUD-403)' {
+            $case = $script:CalibrationCases | Where-Object { $_.caseId -eq 'FRAUD-403' }
+            $res = & $script:CohortScorerScript -CohortTelemetry $case
+            $res.RecommendedAction | Should -Be 'HARD_DROP_BOT_RING'
+            $res.RequiresSocEscalation | Should -BeTrue
         }
-        It 'N-04: KQL query contains zero internal sequence tags or private URLs' {
-            $kql = Get-Content $script:KqlPath -Raw
-            $kql | Should -Not -Match 'mvpfoundry\.alerasoul\.net|Decision Pack 0'
+
+        It 'Protects flash-sale merchant from hard-drop by capping at 3DS2 step-up (FRAUD-404)' {
+            $case = $script:CalibrationCases | Where-Object { $_.caseId -eq 'FRAUD-404' }
+            $res = & $script:CohortScorerScript -CohortTelemetry $case
+            $res.RecommendedAction | Should -Be 'CHALLENGE_3DS2_STEP_UP'
+            $res.PeakConversionGuard | Should -BeTrue
         }
-        It 'N-05: README documentation contains zero internal sequence numbering' {
-            $readme = Get-Content (Join-Path $script:RepoRoot 'README.md') -Raw
-            $readme | Should -Not -Match 'Decision Pack 0|mvpfoundry\.alerasoul\.net'
+    }
+
+    Context 'Microsoft Graph v2.x SOC Escalation & Zero-Leak Governance' {
+        It 'Builds valid SOC Teams Adaptive Card payload in DryRun mode' {
+            $case = $script:CalibrationCases | Where-Object { $_.caseId -eq 'FRAUD-403' }
+            $verdict = & $script:CohortScorerScript -CohortTelemetry $case
+            $card = & $script:SocGraphScript -CohortVerdict $verdict -TeamId '00000000-0000-0000-0000-000000000001' -ChannelId '19:soc@thread.tacv2' -DryRun
+            $card.Status | Should -Be 'DRY_RUN_PREPARED'
+            $card.GraphUri | Should -Match '^https://graph\.microsoft\.com/v1\.0/teams/'
         }
-        It 'N-06: Enforces fail-closed ErrorActionPreference or deterministic condition branches' {
-            $raw = Get-Content $script:EvaluatorPath -Raw
-            $raw | Should -Match 'ErrorActionPreference|if\s*\('
-        }
-        It 'N-07: Repository root excludes internal agent guidelines or pre-commit hook scripts' {
-            Test-Path (Join-Path $script:RepoRoot 'AGENTS.md') | Should -BeFalse
-            Test-Path (Join-Path $script:RepoRoot '.githooks') | Should -BeFalse
-        }
-        It 'N-08: Open-source MIT LICENSE is present at repository root' {
-            Test-Path (Join-Path $script:RepoRoot 'LICENSE') | Should -BeTrue
+
+        It 'Contains zero Bicep or Terraform files and zero internal sequence tags' {
+            $iac = Get-ChildItem -Path $script:RepoRoot -Recurse -File | Where-Object { $_.Extension -in '.bicep', '.tf' }
+            $iac.Count | Should -Be 0
+            (Get-Content (Join-Path $script:RepoRoot 'README.md') -Raw) | Should -Not -Match 'Decision Pack 0|mvpfoundry\.alerasoul\.net|idea-021'
+            (Get-Content $script:KqlPath -Raw) | Should -Match 'summarize|where'
+            (Get-Item (Join-Path $script:RepoRoot 'docs/FRAUD-TRIAGE-RUNBOOK.md')).Length | Should -BeGreaterThan 2048
         }
     }
 }

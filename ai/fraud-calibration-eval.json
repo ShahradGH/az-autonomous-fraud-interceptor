@@ -1,0 +1,47 @@
+[
+  {
+    "caseId": "FRAUD-401",
+    "merchantTenantId": "contoso-uk-retail",
+    "isPeakHourWindow": true,
+    "binVelocity10s": 4,
+    "distinctBins10s": 2,
+    "deviceEntropyScore": 0.14,
+    "asnDatacentreRatio": 0.02,
+    "geoVelocityKmPerHr": 12,
+    "expectedAction": "PERMIT_FASTLANE"
+  },
+  {
+    "caseId": "FRAUD-402",
+    "merchantTenantId": "contoso-uk-retail",
+    "isPeakHourWindow": true,
+    "binVelocity10s": 42,
+    "distinctBins10s": 9,
+    "deviceEntropyScore": 0.64,
+    "asnDatacentreRatio": 0.38,
+    "geoVelocityKmPerHr": 410,
+    "expectedAction": "CHALLENGE_3DS2_STEP_UP"
+  },
+  {
+    "caseId": "FRAUD-403",
+    "merchantTenantId": "contoso-uk-retail",
+    "isPeakHourWindow": false,
+    "binVelocity10s": 210,
+    "distinctBins10s": 34,
+    "deviceEntropyScore": 0.94,
+    "asnDatacentreRatio": 0.89,
+    "geoVelocityKmPerHr": 1850,
+    "expectedAction": "HARD_DROP_BOT_RING"
+  },
+  {
+    "caseId": "FRAUD-404",
+    "merchantTenantId": "contoso-uk-retail",
+    "isPeakHourWindow": true,
+    "binVelocity10s": 78,
+    "distinctBins10s": 6,
+    "deviceEntropyScore": 0.48,
+    "asnDatacentreRatio": 0.22,
+    "geoVelocityKmPerHr": 95,
+    "isKnownFlashSaleMerchant": true,
+    "expectedAction": "CHALLENGE_3DS2_STEP_UP"
+  }
+]
