@@ -72,6 +72,28 @@ Describe 'Real-Time Fraud Interception: Fabric RTI, Event Hubs & AI Cohort Score
             $res.RecommendedAction | Should -Be 'CHALLENGE_3DS2_STEP_UP'
             $res.PeakConversionGuard | Should -BeTrue
         }
+
+        It 'Fails closed when -UseLiveFoundry is set without -FoundryEndpoint and supports mocked live Foundry REST call' {
+            $case = $script:CalibrationCases | Where-Object { $_.caseId -eq 'FRAUD-401' }
+            { & $script:CohortScorerScript -CohortTelemetry $case -UseLiveFoundry } | Should -Throw '*FoundryEndpoint*'
+
+            Mock Invoke-RestMethod {
+                return [PSCustomObject]@{
+                    choices = @(
+                        [PSCustomObject]@{
+                            message = [PSCustomObject]@{
+                                content = '{"recommendedAction":"PERMIT_FASTLANE","rationale":"Low entropy checkout during peak window."}'
+                            }
+                        }
+                    )
+                }
+            }
+
+            $res = & $script:CohortScorerScript -CohortTelemetry $case -UseLiveFoundry -FoundryEndpoint 'https://contoso-foundry.openai.azure.com' -FoundryApiKey 'test-key'
+            $res.InferenceMode | Should -Be 'LIVE_FOUNDRY'
+            $res.RecommendedAction | Should -Be 'PERMIT_FASTLANE'
+            Should -Invoke Invoke-RestMethod -Times 1
+        }
     }
 
     Context 'Microsoft Graph v2.x SOC Escalation & Zero-Leak Governance' {
