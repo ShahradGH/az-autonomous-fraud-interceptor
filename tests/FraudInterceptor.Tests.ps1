@@ -113,4 +113,48 @@ Describe 'Real-Time Fraud Interception: Fabric RTI, Event Hubs & AI Cohort Score
             (Get-Item (Join-Path $script:RepoRoot 'docs/FRAUD-TRIAGE-RUNBOOK.md')).Length | Should -BeGreaterThan 2048
         }
     }
+
+    Context 'Identity & Microsoft Graph v2.x SOC Escalation Module' {
+        BeforeAll {
+            Import-Module (Join-Path $script:RepoRoot 'identity/SocIdentityEscalation.psd1') -Force
+        }
+
+        It 'Resolves active Payments Risk & SOC responders from Entra ID group' {
+            $mockGraph = {
+                param($m, $u, $b)
+                return [PSCustomObject]@{
+                    value = @(
+                        [PSCustomObject]@{ userPrincipalName = 'soc1@contoso.com'; accountEnabled = $true },
+                        [PSCustomObject]@{ userPrincipalName = 'soc2@contoso.com'; accountEnabled = $false }
+                    )
+                }
+            }
+
+            $res = Get-SocOnCallResponderRoster -SocGroupId 'grp-soc-01' -GraphInvoker $mockGraph
+            $res.ActiveResponders | Should -Be 1
+            $res.RosterReady | Should -BeTrue
+        }
+
+        It 'Flags high-risk merchant admin account for token revocation' {
+            $mockGraph = {
+                param($m, $u, $b)
+                return [PSCustomObject]@{
+                    id                = 'usr-merch-01'
+                    userPrincipalName = 'merchant.admin@contoso.com'
+                    riskLevel         = 'high'
+                    riskState         = 'atRisk'
+                }
+            }
+
+            $res = Test-MerchantAdminSignInRisk -UserId 'usr-merch-01' -GraphInvoker $mockGraph
+            $res.RequiresTokenRevoke | Should -BeTrue
+        }
+
+        It 'Dispatches fraud-case Teams escalation thread via Graph v1.0' {
+            $mockGraph = { param($m, $u, $b) return [PSCustomObject]@{ id = 'msg-fraud-01' } }
+            $res = Invoke-FraudCaseTeamsThread -TeamId 't-soc' -ChannelId 'c-soc' -CaseId 'FRAUD-403' -RiskScore 0.91 -RecommendedAction 'HARD_DROP_BOT_RING' -GraphInvoker $mockGraph
+            $res.Dispatched | Should -BeTrue
+            $res.MessageId | Should -Be 'msg-fraud-01'
+        }
+    }
 }

@@ -8,7 +8,7 @@
 
 ---
 
-## 1. Executive & C-Suite Brief
+## 1. Executive & C-Suite Business Value
 
 ### Business Risk: BIN-Stuffing Attacks vs Peak-Hour Conversion Loss
 Digital commerce platforms face an asymmetric trade-off during payment bursts:
@@ -22,6 +22,8 @@ Digital commerce platforms face an asymmetric trade-off during payment bursts:
 | **Peak-Hour False Positives** | High during flash sales | **Protected (ADR-001)** via dynamic 3DS2 step-up calibration |
 | **Fast-Lane Isolation** | Shared queue saturation | **Dedicated `eh-tx-verified-fastlane`** + backpressure shed |
 | **SOC Triage Speed** | Manual KQL log hunting | **Real-time Graph v2.x Teams Adaptive Card** |
+
+- **PSD2 SCA & PCI-DSS Governance Alignment**: Dynamic 3DS2 step-up routing preserves legitimate peak-hour conversion whilst isolating card-testing rings and flagging compromised merchant admin identities via Entra ID Identity Protection.
 
 ---
 
@@ -47,9 +49,15 @@ Digital commerce platforms face an asymmetric trade-off during payment bursts:
 - `ai/fraud-calibration-eval.json` — Synthetic Contoso UK Retail evaluation cases.
 - `src/Test-EventHubVelocityShunt.ps1` — Deterministic Event Hubs fast-lane & backpressure shunt.
 - `src/Invoke-FabricRtiEventhouseSync.ps1` — Fabric RTI Eventhouse & Event Hubs REST control-plane sync.
+- `identity/SocIdentityEscalation.psm1` — Microsoft Graph v2.x module for SOC responder roster resolution, Identity Protection risky-user checks, and Teams fraud-case threads.
 - `graph/Send-SocFraudEscalationCard.ps1` — Microsoft Graph v2.x SOC Teams Adaptive Card dispatcher.
 - `queries/Payment-Velocity-Spikes.kql` — Fabric KQL Eventhouse velocity & ASN correlation query.
 - `docs/FRAUD-TRIAGE-RUNBOOK.md` — L2/L3 Payments Risk & SRE runbook.
+
+### Chief Architect / Chief Engineer Pilot-Grafting Instructions
+1. **Entra ID Workload Identity & Graph Scopes**: Assign a Managed Identity to your fraud-triage runner with `IdentityRiskyUser.Read.All`, `GroupMember.Read.All`, and `ChannelMessage.Send` in Microsoft Graph v2.x, plus Event Hubs Data Receiver / Fabric Workspace Contributor roles.
+2. **Graft onto Existing Event Hubs & Fabric RTI**: Import `identity/SocIdentityEscalation.psm1` alongside `src/Invoke-FabricRtiEventhouseSync.ps1` so `Test-MerchantAdminSignInRisk` correlates checkout velocity spikes with compromised merchant accounts—zero Bicep or Terraform required.
+3. **Verify On-Call SOC Routing**: Call `Get-SocOnCallResponderRoster` before dispatching `HARD_DROP_BOT_RING` escalations so alerts land with active Payments Risk responders.
 
 ### Exact PowerShell & Pester 6.x Verification Commands
 ```powershell
